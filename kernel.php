@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/config.php'); //导入应用文件
+$config = include(dirname(__FILE__).'/config.php');
 require_once(dirname(__FILE__).'/api.class.php'); //导入自制API类库
 
 /**
@@ -77,11 +77,11 @@ class User {
      */
     public function checkPerm() {
         if(!isset($_COOKIE['dingstudio_sso']) || $_COOKIE['dingstudio_sso'] == '' || !isset($_COOKIE['dingstudio_ssotoken']) || $_COOKIE['dingstudio_ssotoken'] == '') {
-            if($com_array['passport_ssl']) {
-                header('Location: https://'.$com_array['passport_srv'].'/sso/login?returnUrl='.urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']));
+            if($config['passport_ssl']) {
+                header('Location: https://'.$config['passport_srv'].'/sso/login?returnUrl='.urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']));
             }
             else {
-                header('Location: http://'.$com_array['passport_srv'].'/sso/login?returnUrl='.urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']));
+                header('Location: http://'.$config['passport_srv'].'/sso/login?returnUrl='.urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']));
             }
         }
         //TODO
@@ -93,7 +93,7 @@ class User {
      * @return JSON
      */
     public function checkReferer() {
-        if($urlpath != $com_array['trust_uri']) {
+        if($urlpath != $config['trust_uri']) {
             Response::jsonEncode(403, '安全校验无法通过');
         }
     }
@@ -115,10 +115,10 @@ class DB {
      * 实例化进程初始构造入口
      */
     private function __construct() {
-        $this->host = $db_array['mysql_host'];
-        $this->user = $db_array['mysql_user'];
-        $this->pwd = $db_array['mysql_pwd'];
-        $this->db = $db_array['mysql_db'];
+        $this->host = $config['mysql_host'];
+        $this->user = $config['mysql_user'];
+        $this->pwd = $config['mysql_pwd'];
+        $this->db = $config['mysql_db'];
     }
 
     /**

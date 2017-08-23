@@ -1,2 +1,2 @@
-# kgroup_system_demo
-Tencent Karoke Family Group System Demo
+# 全民K歌家族线上系统(Demo)
+## 注意：本项目当前依旧处于开发状态，且更新进度较慢。学生党无法诉说的苦衷~~
