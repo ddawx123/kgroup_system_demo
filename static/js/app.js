@@ -67,7 +67,7 @@ function checkSubmit(username, locate, qqnum, like) {
             preConfirm: function () {
                 return new Promise(function (resolve) {
                     $.ajax({
-                        url: "http://newblog.dingstudio.cn/kgroup_sys/ajax.php",
+                        url: "ajax.php",
                         type: "post",
                         dataType: "json",
                         data: {
@@ -92,6 +92,10 @@ function checkSubmit(username, locate, qqnum, like) {
                             }
                             else if (res.code === 502) {
                                 swal.insertQueueStep("哎呀，服务器忙死了！请稍候再次尝试，如果此状况反复出现请联系管理员！");
+                                resolve();
+                            }
+                            else if (res.code === 503) {
+                                swal.insertQueueStep("无法连接数据库！请稍候再次尝试，如果此状况反复出现请联系管理员！");
                                 resolve();
                             }
                             else {

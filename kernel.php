@@ -1,5 +1,4 @@
 <?php
-$config = include(dirname(__FILE__).'/config.php');
 require_once(dirname(__FILE__).'/api.class.php'); //导入自制API类库
 
 /**
@@ -40,11 +39,14 @@ class Router {
  */
 class Model {
 
-    public function apply_user($username, $locate, $qqnum, $like) {
+    public static function apply_user($username, $locate, $qqnum, $like) {
         if($username == '' || $locate == '' || $qqnum == '' || $like == '') {
             Response::jsonEncode(405, '必填项不能为空');
         }
         $sqlconn = DB::getInstance()->connect();
+        if(!$sqlconn) {
+            Response::jsonEncode(503, '数据库连接超时');
+        }
         $sqlcode = "select * from songusers where qqnum='{$qqnum}'";
         $result = $sqlconn->query($sqlcode);
         if($result) {
@@ -76,6 +78,7 @@ class User {
      * 需要管理员权限的页面游客阻断函数
      */
     public function checkPerm() {
+        $config = include(dirname(__FILE__).'/config.php');
         if(!isset($_COOKIE['dingstudio_sso']) || $_COOKIE['dingstudio_sso'] == '' || !isset($_COOKIE['dingstudio_ssotoken']) || $_COOKIE['dingstudio_ssotoken'] == '') {
             if($config['passport_ssl']) {
                 header('Location: https://'.$config['passport_srv'].'/sso/login?returnUrl='.urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']));
@@ -115,6 +118,7 @@ class DB {
      * 实例化进程初始构造入口
      */
     private function __construct() {
+        $config = include(dirname(__FILE__).'/config.php');
         $this->host = $config['mysql_host'];
         $this->user = $config['mysql_user'];
         $this->pwd = $config['mysql_pwd'];
