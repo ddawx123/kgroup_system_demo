@@ -1,4 +1,5 @@
 <?php
+$config = include(dirname(__FILE__).'/config.php');
 require_once(dirname(__FILE__).'/api.class.php'); //导入自制API类库
 
 /**
@@ -13,22 +14,31 @@ class Router {
         self::start();
     }
 
+    public function loadManager() {
+        header('Content-Type: text/html; charset=UTF-8');
+        $config = include(dirname(__FILE__).'/config.php');
+        if(!User::checkPerm()) {
+            if($config['passport_ssl']) {
+                header('Location: https://'.$config['passport_srv'].'/sso/login?returnUrl='.urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']));
+            }
+            else {
+                header('Location: http://'.$config['passport_srv'].'/sso/login?returnUrl='.urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']));
+            }
+        }
+        else {
+            $login_user = $_COOKIE['dingstudio_sso'];
+            $operator_token = $_COOKIE['dingstudio_ssotoken'];
+        }
+    }
+
     public function start() {
         switch($_POST['type']) {
             case "apply_usr":
             //User::checkReferer($_SERVER['HTTP_REFERER']);
             Model::apply_user($_POST['username'], $_POST['locate'], $_POST['qqnum'], $_POST['like']);
             break;
-            case "delete_usr":
-            User::checkPerm();
-            break;
-            case "permit_usr":
-            User::checkPerm();
-            break;
-            case "block_usr":
-            User::checkPerm();
-            break;
             default:
+            Response::jsonEncode(500, '无效的请求方法');
             break;
         }
     }
@@ -44,15 +54,14 @@ class Model {
             Response::jsonEncode(405, '必填项不能为空');
         }
         $sqlconn = DB::getInstance()->connect();
-        if(!$sqlconn) {
-            Response::jsonEncode(503, '数据库连接超时');
-        }
         $sqlcode = "select * from songusers where qqnum='{$qqnum}'";
         $result = $sqlconn->query($sqlcode);
-        if($result) {
+        $rows = mysqli_fetch_array($result);
+        mysqli_free_result($result);
+        if($rows['qqnum']==$qqnum) {
             Response::jsonEncode(403, '用户QQ信息已存在');
         }
-        $sqlcode = "insert into songusers (name, locate, qqnum, like) value ('{$username}', '{$locate}', '{$qqnum}', '{$like}')";
+        $sqlcode = "insert into songusers (name, locate, qqnum, likestr) value ('{$username}', '{$locate}', '{$qqnum}', '{$like}')";
         $result = $sqlconn->query($sqlcode);
         if(!$result) {
             Response::jsonEncode(502, '数据库写入超时');
@@ -77,15 +86,13 @@ class User {
     /**
      * 需要管理员权限的页面游客阻断函数
      */
-    public function checkPerm() {
-        $config = include(dirname(__FILE__).'/config.php');
+    public static function checkPerm() {
+        
         if(!isset($_COOKIE['dingstudio_sso']) || $_COOKIE['dingstudio_sso'] == '' || !isset($_COOKIE['dingstudio_ssotoken']) || $_COOKIE['dingstudio_ssotoken'] == '') {
-            if($config['passport_ssl']) {
-                header('Location: https://'.$config['passport_srv'].'/sso/login?returnUrl='.urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']));
-            }
-            else {
-                header('Location: http://'.$config['passport_srv'].'/sso/login?returnUrl='.urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']));
-            }
+            return false;
+        }
+        else {
+            return true;
         }
         //TODO
     }
@@ -95,7 +102,7 @@ class User {
      * @param string $urlpath 来路URL路径
      * @return JSON
      */
-    public function checkReferer() {
+    public static function checkReferer() {
         if($urlpath != $config['trust_uri']) {
             Response::jsonEncode(403, '安全校验无法通过');
         }

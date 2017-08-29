@@ -94,10 +94,6 @@ function checkSubmit(username, locate, qqnum, like) {
                                 swal.insertQueueStep("哎呀，服务器忙死了！请稍候再次尝试，如果此状况反复出现请联系管理员！");
                                 resolve();
                             }
-                            else if (res.code === 503) {
-                                swal.insertQueueStep("无法连接数据库！请稍候再次尝试，如果此状况反复出现请联系管理员！");
-                                resolve();
-                            }
                             else {
                                 swal.insertQueueStep("发生未知错误，请刷新页面后再次尝试！");
                                 resolve();

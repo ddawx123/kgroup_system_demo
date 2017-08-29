@@ -22,7 +22,6 @@ class Response {
 		);
 		
 		header("Content-Type: application/json; charset=UTF-8");
-		ob_clean();
 		echo json_encode($result,JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
 		exit;
 	}

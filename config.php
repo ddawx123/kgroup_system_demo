@@ -5,11 +5,11 @@
 
 // 数据库信息配置
 return array(
-    'mysql_host'    =>  'ddns1.dingcloud.xyz:3306',
-    'mysql_user'    =>  'kgroup',
-    'mysql_pwd' =>  'kgroup@2017yhy',
-    'mysql_db'  =>  'kgroup_db',
-    'trust_uri'   =>  'http://newblog.dingstudio.cn/kgroup_sys/apply.html',
-    'passport_srv'  =>  'passport.dingstudio.cn',
+    'mysql_host'    =>  'sqld.example.org:3306',
+    'mysql_user'    =>  'example_user_here',
+    'mysql_pwd' =>  'example_password_here',
+    'mysql_db'  =>  'example_dbname_here',
+    'trust_uri'   =>  'http://www.example.org/apply.html',
+    'passport_srv'  =>  'passport.example.org',
     'passport_ssl'  =>  true
 );
